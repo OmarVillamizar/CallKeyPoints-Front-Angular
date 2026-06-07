@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { phosphorList } from '@ng-icons/phosphor-icons/regular';
 import { Sidebar } from '../sidebar/sidebar';
+import { ToastHost } from '../../ui/toast/toast-host';
 
 /**
  * Authenticated app shell: desktop icon-rail sidebar + routed content, plus a mobile top-bar
@@ -11,7 +12,7 @@ import { Sidebar } from '../sidebar/sidebar';
  */
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, Sidebar, NgIcon],
+  imports: [RouterOutlet, Sidebar, NgIcon, ToastHost],
   viewProviders: [provideIcons({ phosphorList })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app-shell.html',

@@ -1,15 +1,189 @@
-<section class="page">
-  <header>
+<section class="config">
+  <header class="config__head">
     <p class="page__eyebrow">Configuración</p>
     <h1 class="page__title">Base de conocimiento y prompt</h1>
     <p class="page__lead">
-      Carga la base de conocimiento y la plantilla de prompt que el backend usa como fuente de
-      verdad al generar cada reporte, junto al perfil del técnico.
+      La base de conocimiento y la plantilla de prompt son la fuente de verdad que el backend usa
+      para generar cada reporte. Edita y guarda cada bloque por separado.
     </p>
   </header>
 
-  <div class="placeholder">
-    <ng-icon name="phosphorGearSix" />
-    <p>El editor de KB, prompt y perfil llega en la Fase 5.</p>
-  </div>
+  @switch (status()) {
+    @case ('loading') {
+      <div class="panels">
+        @for (i of [0, 1, 2]; track i) {
+          <div class="sk-panel">
+            <span class="sk sk--title"></span>
+            <span class="sk sk--area"></span>
+          </div>
+        }
+      </div>
+    }
+
+    @case ('error') {
+      <div class="state state--error" role="alert">
+        <span class="state__mark"><ng-icon name="phosphorWarning" /></span>
+        <p>{{ errorMsg() }}</p>
+        <button type="button" class="btn" (click)="load()">Reintentar</button>
+      </div>
+    }
+
+    @case ('ready') {
+      <form class="panels" [formGroup]="form">
+        <!-- Base de conocimiento -->
+        <article class="panel">
+          <header class="panel__head">
+            <span class="panel__mark"><ng-icon name="phosphorBookOpenText" /></span>
+            <div class="panel__heading">
+              <h2 class="panel__title">Base de conocimiento</h2>
+              <p class="panel__sub">Protocolos y criterios que el modelo consulta al clasificar.</p>
+            </div>
+            @if (kbDirty()) {
+              <span class="panel__flag">Sin guardar</span>
+            }
+          </header>
+
+          <textarea
+            class="panel__area"
+            formControlName="knowledgeBase"
+            rows="12"
+            placeholder="Protocolo de severidad, criterios de responsabilidad, tiempos de respuesta…"
+          ></textarea>
+
+          <footer class="panel__foot">
+            <span class="panel__meta">
+              <span class="tnum">{{ kbCount() }} caracteres</span>
+              @if (kbUpdated()) {
+                <span aria-hidden="true">·</span><span>Actualizado {{ kbUpdated() }}</span>
+              }
+            </span>
+            <span class="panel__actions">
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="resetKb()"
+                [disabled]="!kbDirty() || savingKb()"
+              >
+                Revertir
+              </button>
+              <button
+                type="button"
+                class="btn"
+                (click)="saveKb()"
+                [disabled]="!kbDirty() || savingKb()"
+              >
+                {{ savingKb() ? 'Guardando…' : 'Guardar' }}
+              </button>
+            </span>
+          </footer>
+        </article>
+
+        <!-- Plantilla de prompt -->
+        <article class="panel">
+          <header class="panel__head">
+            <span class="panel__mark"><ng-icon name="phosphorTerminalWindow" /></span>
+            <div class="panel__heading">
+              <h2 class="panel__title">Plantilla de prompt</h2>
+              <p class="panel__sub">Instrucciones del sistema para la extracción estructurada.</p>
+            </div>
+            @if (promptDirty()) {
+              <span class="panel__flag">Sin guardar</span>
+            }
+          </header>
+
+          <textarea
+            class="panel__area mono"
+            formControlName="prompt"
+            rows="12"
+            placeholder="Eres un asistente que extrae los campos del reporte a partir de la transcripción…"
+          ></textarea>
+
+          <footer class="panel__foot">
+            <span class="panel__meta">
+              <span class="tnum">{{ promptCount() }} caracteres</span>
+              @if (promptUpdated()) {
+                <span aria-hidden="true">·</span><span>Actualizado {{ promptUpdated() }}</span>
+              }
+            </span>
+            <span class="panel__actions">
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="resetPrompt()"
+                [disabled]="!promptDirty() || savingPrompt()"
+              >
+                Revertir
+              </button>
+              <button
+                type="button"
+                class="btn"
+                (click)="savePrompt()"
+                [disabled]="!promptDirty() || savingPrompt()"
+              >
+                {{ savingPrompt() ? 'Guardando…' : 'Guardar' }}
+              </button>
+            </span>
+          </footer>
+        </article>
+
+        <!-- Perfil del técnico -->
+        <article class="panel">
+          <header class="panel__head">
+            <span class="panel__mark"><ng-icon name="phosphorUser" /></span>
+            <div class="panel__heading">
+              <h2 class="panel__title">Perfil del técnico</h2>
+              <p class="panel__sub">Nombre que aparece como responsable en los reportes.</p>
+            </div>
+            @if (nameDirty()) {
+              <span class="panel__flag">Sin guardar</span>
+            }
+          </header>
+
+          <div class="field">
+            <label for="displayName">Nombre para mostrar</label>
+            <input
+              id="displayName"
+              class="panel__input"
+              type="text"
+              formControlName="displayName"
+              [maxlength]="NAME_MAX"
+              placeholder="Ej. Camila Rojas"
+              [class.is-invalid]="nameInvalid()"
+            />
+            @if (nameInvalid()) {
+              <span class="field__err">Máximo {{ NAME_MAX }} caracteres.</span>
+            }
+          </div>
+
+          <footer class="panel__foot">
+            <span class="panel__meta">
+              @if (profileUpdated()) {
+                <span>Actualizado {{ profileUpdated() }}</span>
+              } @else {
+                <span>Sin guardar aún</span>
+              }
+            </span>
+            <span class="panel__actions">
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="resetProfile()"
+                [disabled]="!nameDirty() || savingProfile()"
+              >
+                Revertir
+              </button>
+              <button
+                type="button"
+                class="btn"
+                (click)="saveProfile()"
+                [disabled]="!nameDirty() || nameInvalid() || savingProfile()"
+              >
+                {{ savingProfile() ? 'Guardando…' : 'Guardar' }}
+              </button>
+            </span>
+          </footer>
+        </article>
+      </form>
+    }
+  }
 </section>

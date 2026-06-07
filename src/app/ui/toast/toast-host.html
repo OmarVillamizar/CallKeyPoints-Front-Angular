@@ -1,0 +1,20 @@
+<div class="toasts" aria-live="polite">
+  @for (t of toasts(); track t.id) {
+    <div
+      class="toast"
+      [attr.data-tone]="t.tone"
+      role="status"
+      animate.enter="toast-in"
+      animate.leave="toast-out"
+    >
+      <ng-icon
+        class="toast__icon"
+        [name]="t.tone === 'success' ? 'phosphorCheckCircle' : 'phosphorWarningCircle'"
+      />
+      <span class="toast__msg">{{ t.message }}</span>
+      <button type="button" class="toast__close" (click)="dismiss(t.id)" aria-label="Cerrar">
+        <ng-icon name="phosphorX" />
+      </button>
+    </div>
+  }
+</div>
