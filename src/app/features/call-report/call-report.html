@@ -1,14 +1,85 @@
-<section class="page">
-  <header>
-    <p class="page__eyebrow">Caso #{{ id() }}</p>
-    <h1 class="page__title">Reporte ejecutivo de la llamada</h1>
-    <p class="page__lead">
-      Aquí se mostrará el reporte de 9 secciones con clasificación, resolución y exportación a PDF.
-    </p>
-  </header>
+<section class="report-page">
+  <!-- Toolbar — never printed -->
+  <div class="toolbar no-print">
+    <button type="button" class="tbtn tbtn--ghost" (click)="back()">
+      <ng-icon name="phosphorArrowLeft" />
+      Volver
+    </button>
 
-  <div class="placeholder">
-    <ng-icon name="phosphorFileText" />
-    <p>El reporte ejecutivo y la exportación a PDF llegan en la Fase 4.</p>
+    @if (data()) {
+      <div class="toolbar__actions">
+        @if (confirming()) {
+          <span class="confirm-q">¿Eliminar este reporte?</span>
+          <button
+            type="button"
+            class="tbtn tbtn--ghost"
+            (click)="cancelDelete()"
+            [disabled]="deleting()"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="tbtn tbtn--danger"
+            (click)="confirmDelete()"
+            [disabled]="deleting()"
+          >
+            @if (deleting()) {
+              Eliminando…
+            } @else {
+              Sí, eliminar
+            }
+          </button>
+        } @else {
+          <button type="button" class="tbtn tbtn--ghost" (click)="askDelete()">
+            <ng-icon name="phosphorTrash" />
+            Eliminar
+          </button>
+          <button type="button" class="tbtn" (click)="exportPdf()">
+            <ng-icon name="phosphorFilePdf" />
+            Exportar PDF
+          </button>
+        }
+      </div>
+    }
   </div>
+
+  <!-- Content -->
+  @if (data(); as d) {
+    <app-report [data]="d" />
+  } @else if (loading()) {
+    <div class="sk-report" aria-live="polite" aria-busy="true">
+      <div class="sk-report__head">
+        <span class="sk sk--seal"></span>
+        <span class="sk-report__head-lines">
+          <span class="sk sk--sm"></span>
+          <span class="sk sk--md"></span>
+        </span>
+      </div>
+      <div class="sk-report__body">
+        @for (i of [0, 1, 2, 3]; track i) {
+          <div class="sk-report__block">
+            <span class="sk sk--sm"></span>
+            <div class="sk-report__row">
+              <span class="sk sk--tile"></span>
+              <span class="sk sk--tile"></span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (notFound()) {
+    <div class="state no-print">
+      <span class="state__mark"><ng-icon name="phosphorWarning" /></span>
+      <h2 class="state__title">Reporte no encontrado</h2>
+      <p>El caso #{{ id() }} no existe o fue eliminado.</p>
+      <button type="button" class="tbtn" (click)="back()">Ir a nuevo reporte</button>
+    </div>
+  } @else if (errorMsg(); as msg) {
+    <div class="state state--error no-print" role="alert">
+      <span class="state__mark"><ng-icon name="phosphorWarning" /></span>
+      <p>{{ msg }}</p>
+      <button type="button" class="tbtn" (click)="reload()">Reintentar</button>
+    </div>
+  }
 </section>
