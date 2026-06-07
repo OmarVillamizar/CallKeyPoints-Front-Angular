@@ -1,6 +1,6 @@
 <div class="panel" #panel>
   <header class="head">
-    <a class="brand" routerLink="/new" (click)="onLink()" aria-label="CallKeyPoints — inicio">
+    <a class="brand" routerLink="/new" (click)="onLink()" aria-label="CallKeyPoints, ir al inicio">
       <img class="brand__mark" src="insignia.svg" alt="" width="34" height="34" />
       <img class="brand__word" src="logo.svg" alt="CallKeyPoints" height="26" />
     </a>
@@ -69,6 +69,7 @@
           routerLinkActive="is-active"
           (click)="onLink()"
           animate.enter="item-in"
+          [style.animation-delay.ms]="$index < 12 ? $index * 30 : 0"
         >
           <ng-icon class="item__icon" name="phosphorFileText" />
           <span class="item__body">

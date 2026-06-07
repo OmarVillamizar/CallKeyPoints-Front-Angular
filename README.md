@@ -11,6 +11,21 @@ modern, idiomatic Angular.
 
 ---
 
+## What's inside
+
+| Route | View | Highlights |
+|-------|------|------------|
+| `/login` | Supabase sign-in | Typed reactive form, inline error, guest guard |
+| `/new` | New report composer | Transcript textarea + char count, slow-LLM skeleton, live report render, retry on error |
+| `/calls/:id` | Executive report | 9-section report, **Export PDF** (browser print), inline two-step delete, 404/error states |
+| `/config` | KB + prompt + profile | Per-section dirty tracking, independent save, revert, toasts, validation |
+
+Cross-cutting: an animated **icon-rail sidebar** (collapsed → hover-expand → pin, persisted),
+a mobile off-canvas drawer, a global **toast** stack, and loading/empty/error states throughout.
+All motion honors `prefers-reduced-motion`; the whole UI is light-locked warm monochrome.
+
+---
+
 ## Tech stack
 
 | Concern | Choice |
