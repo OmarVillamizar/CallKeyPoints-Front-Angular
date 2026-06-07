@@ -26,6 +26,10 @@ Demo/portfolio Angular frontend for CallKeyPoints. Consumes `CallKeyPoints-Micro
   Warm monochrome, light-locked: cream/beige + espresso ink accent. One radius scale, fine strokes.
 - **Responsive**: CSS container queries + tokens; `min-h: 100dvh`, never `h-screen`. Honor
   `prefers-reduced-motion` for all motion.
+- **Tactile controls (required)**: every button / interactive control dips on `:active`
+  (`transform: scale(0.97)`) for physical feedback. Real `<button>`s inherit it from the global
+  rule in `styles.scss`; `<a>` link-buttons add a matching `:active` transform and must include
+  `transform` in their own `transition`. Reduced-motion users get an instant snap.
 
 ## Structure
 

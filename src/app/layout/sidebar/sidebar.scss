@@ -39,14 +39,23 @@
   box-shadow: none;
 }
 
-/* Labels + fields reveal only when expanded. */
+/*
+  Labels + fields reveal only when expanded. We collapse their actual width (not just
+  opacity) so the rail truly shrinks to its icons — otherwise the hidden text keeps its
+  width, pushing icons off-center and clipping at the rail edge.
+*/
 .label {
   opacity: 0;
-  transition: opacity var(--dur-fast) var(--ease-out);
+  max-width: 0;
+  overflow: hidden;
   white-space: nowrap;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    max-width var(--dur-base) var(--ease-out);
 }
 :host.is-expanded .label {
   opacity: 1;
+  max-width: 220px;
 }
 :host:not(.is-expanded) .label {
   pointer-events: none;
@@ -59,6 +68,13 @@ a {
 }
 button {
   font: inherit;
+}
+
+/* tactile press for the link-buttons (the global rule covers real <button>s) */
+.cta:active,
+.nav-link:active,
+.item:active {
+  transform: scale(0.98);
 }
 
 .cta,
@@ -75,6 +91,7 @@ button {
 :host:not(.is-expanded) :is(.cta, .nav-link, .item, .search) {
   justify-content: center;
   padding: 0;
+  gap: 0; /* drop the icon->label gap so the lone icon centers in the rail */
 }
 
 ng-icon {
@@ -133,6 +150,9 @@ ng-icon {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 .cta:hover {
   background: var(--color-accent-strong);
@@ -200,7 +220,9 @@ ng-icon {
 .item {
   position: relative;
   cursor: pointer;
-  transition: background-color var(--dur-fast) var(--ease-out);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 .item:hover {
   background: var(--color-soft);
@@ -252,7 +274,8 @@ ng-icon {
   opacity: 0;
   transition:
     opacity var(--dur-fast) var(--ease-out),
-    background-color var(--dur-fast) var(--ease-out);
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 .item__del ng-icon {
   font-size: 14px;
@@ -316,7 +339,9 @@ ng-icon {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color var(--dur-fast) var(--ease-out);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 .nav-link:hover {
   background: var(--color-soft);
@@ -341,6 +366,11 @@ ng-icon {
 :host:not(.is-expanded) .user {
   justify-content: center;
   padding: 0;
+  gap: 0;
+}
+/* collapsed rail shows only the avatar — sign out lives in the expanded state */
+:host:not(.is-expanded) .user__out {
+  display: none;
 }
 .user__avatar {
   flex: 0 0 auto;
@@ -381,7 +411,8 @@ ng-icon {
   cursor: pointer;
   transition:
     background-color var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
 }
 .icon-btn ng-icon {
   font-size: 16px;

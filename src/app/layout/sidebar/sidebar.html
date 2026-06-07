@@ -47,7 +47,7 @@
   </div>
 
   <nav class="list" aria-label="Casos">
-    <p class="list__title label">Casos</p>
+    <p class="list__title">Casos</p>
 
     @if (store.loading()) {
       <div class="list__skeletons">
@@ -56,9 +56,9 @@
         }
       </div>
     } @else if (store.error(); as err) {
-      <p class="list__msg label">{{ err }}</p>
+      <p class="list__msg">{{ err }}</p>
     } @else if (filtered().length === 0) {
-      <p class="list__msg label">
+      <p class="list__msg">
         {{ query() ? 'Sin coincidencias.' : 'Aún no hay casos. Crea el primero.' }}
       </p>
     } @else {
@@ -71,7 +71,7 @@
           animate.enter="item-in"
         >
           <ng-icon class="item__icon" name="phosphorFileText" />
-          <span class="item__body label">
+          <span class="item__body">
             <span class="item__title">{{ c.title }}</span>
             <span class="item__time tnum">{{ relative(c.createdAt) }}</span>
           </span>

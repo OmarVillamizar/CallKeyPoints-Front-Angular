@@ -178,6 +178,20 @@ figure {
   border-radius: 4px;
 }
 
+/*
+  Tactile press — every interactive control dips slightly on :active for a physical,
+  responsive feel. Project convention: ALL buttons must have this. Bare <button>s get it
+  for free here; component link-buttons (<a> acting as a button) add a matching :active
+  transform and must include `transform` in their own transition. Reduced-motion users get
+  an instant snap (the global reduced-motion block zeroes the transition duration).
+*/
+button {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+:where(button:not(:disabled), [role='button']):active {
+  transform: scale(0.97);
+}
+
 /* subtle, warm custom scrollbar */
 * {
   scrollbar-width: thin;
