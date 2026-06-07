@@ -1,59 +1,98 @@
-# CallkeypointsFront
+# CallKeyPoints — Angular Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.0.
+Single-page app for **CallKeyPoints**: paste a call transcript, get back an AI-generated
+**structured attention report** (client data, classification, diagnosis, recommended actions,
+quality, executive summary). Authenticate with Supabase, then manage your own list of
+processed calls ("sessions") from an animated sidebar.
 
-## Development server
+This is the **frontend only**. It consumes the separate Spring Boot backend
+`CallKeyPoints-Microservice` over REST. Built as a **technical demo / portfolio** showcasing
+modern, idiomatic Angular.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## Tech stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+| Concern | Choice |
+|---------|--------|
+| Framework | Angular **v22**, standalone, **zoneless** change detection |
+| State | **Signals** + signal stores (no NgRx) |
+| Async reads | `httpResource` / `resource()` (declarative); `HttpClient` for mutations |
+| Routing | Lazy `loadComponent`, functional guards, `withViewTransitions`, `withComponentInputBinding` |
+| Auth | **Supabase Auth** (`@supabase/supabase-js`) → JWT → `Authorization: Bearer` |
+| Styling | **SCSS + CSS custom-property tokens** (warm monochrome, light-locked). No Tailwind. |
+| Animation | Native Angular `animate.enter/leave` + CSS + **Motion One** (`motion`) for sidebar physics |
+| Icons | `@ng-icons/core` + Phosphor |
+| PDF export | Browser print + `@media print` CSS |
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Run locally
 
 ```bash
-ng test
+npm install
+npm start          # ng serve → http://localhost:4200
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+Other scripts:
 
 ```bash
-ng e2e
+npm run build      # ng build → dist/
+npm test           # vitest
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Talking to the backend
 
-## Additional Resources
+- Backend runs on **http://localhost:9080** (`./mvnw spring-boot:run` in `CallKeyPoints-Microservice`).
+- Backend Swagger: **http://localhost:9080/swagger-ui/index.html**.
+- Backend CORS must allow this app's origin: set `CORS_ALLOWED_ORIGINS=http://localhost:4200`.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+
+## Environment
+
+Values live in `src/environments/`. The production `environment.ts` is swapped for
+`environment.development.ts` during `ng serve` (see `fileReplacements` in `angular.json`).
+
+| Var | Description |
+|-----|-------------|
+| `apiBaseUrl` | Backend base, e.g. `http://localhost:9080` |
+| `supabaseUrl` | Supabase project URL (`https://<ref>.supabase.co`) — same project as the React app |
+| `supabaseAnonKey` | Supabase anon/public key (browser-safe) |
+
+**Never** put the Supabase service-role key, JWT secret, DB password, or LLM key in this
+frontend. Only the public anon key belongs here.
+
+---
+
+## Auth flow
+
+1. User logs in through Supabase Auth → receives a session JWT.
+2. Every `/api/**` call sends `Authorization: Bearer <token>` (auth interceptor).
+3. Backend validates the JWT (JWKS) and scopes all data by the user's `sub` (UUID).
+4. Missing/invalid token on a protected route → **401** → redirect to login.
+5. Tokens expire — refreshed via the Supabase session, never hardcoded.
+
+---
+
+## Backend API (all require auth)
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/api/calls` | Create call: runs AI extraction, persists (slow, rate-limited) |
+| `GET` | `/api/calls` | List current user's calls (summary), newest first |
+| `GET` | `/api/calls/{id}` | One full call (`CallDetail`) |
+| `DELETE` | `/api/calls/{id}` | Delete one call |
+| `GET`/`PUT` | `/api/knowledge-base` | Read / save the KB (`{ content }`) |
+| `GET`/`PUT` | `/api/prompt` | Read / save the prompt template (`{ content }`) |
+| `GET`/`PUT` | `/api/profile` | Read / save technician `{ displayName }` |
+
+`CallDetail` exposes the structured report fields as explicit columns (no client-side JSON parse).
+
+---
+
+## Conventions
+
+See `CLAUDE.md` for the full Angular-native conventions enforced in this project
+(standalone, signals, `httpResource`, functional interceptors/guards, `@if/@for/@defer`,
+native template animations, typed reactive forms, component-scoped SCSS over CSS tokens).

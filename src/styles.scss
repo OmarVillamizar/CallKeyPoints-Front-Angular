@@ -1,1 +1,186 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+  CallKeyPoints — Angular frontend global theme.
+
+  Warm monochrome, light-locked. Cream/beige canvas + surfaces, espresso ink as the
+  single accent (CTAs, active state). Semantic ok/warn/alert desaturated to sit on warm
+  neutrals. One radius scale, fine warm strokes. Shared by screen + print so the exported
+  PDF inherits the same look. Tokens are CSS custom properties — component SCSS reads them.
+*/
+
+:root {
+  /* surfaces */
+  --color-canvas: #faf7f2; /* page background, warm cream */
+  --color-surface: #ffffff; /* cards, panels */
+  --color-soft: #f3eee6; /* beige tint, subtle fills */
+  --color-soft-strong: #ece4d6;
+
+  /* strokes (fine, warm) */
+  --color-line: #e8e1d4;
+  --color-line-strong: #d8cebb;
+
+  /* ink / text */
+  --color-ink: #2b2622; /* espresso near-black, primary text + accent */
+  --color-ink-soft: #6b6256;
+  --color-ink-faint: #9c9384;
+  --color-on-accent: #faf7f2; /* text on espresso fills */
+
+  /* accent = espresso */
+  --color-accent: #2b2622;
+  --color-accent-strong: #1b1714;
+  --color-accent-soft: #efe8db; /* warm tint for active/selected */
+
+  /* semantic, warm-desaturated */
+  --color-ok: #4f6f52;
+  --color-ok-soft: #ecf1ea;
+  --color-warn: #8a6a2e;
+  --color-warn-soft: #f6efe0;
+  --color-alert: #9a3b2e;
+  --color-alert-soft: #f6e8e3;
+
+  /* shadows, tinted warm (never pure black) */
+  --shadow-sm: 0 1px 2px rgb(43 38 34 / 0.06), 0 1px 1px rgb(43 38 34 / 0.04);
+  --shadow-md: 0 6px 24px rgb(43 38 34 / 0.08), 0 2px 6px rgb(43 38 34 / 0.05);
+  --shadow-lg: 0 18px 48px rgb(43 38 34 / 0.12);
+
+  /* radii — one scale */
+  --radius-card: 14px;
+  --radius-input: 10px;
+  --radius-pill: 999px;
+
+  /* typography */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+
+  /* layout rails */
+  --sidebar-rail: 64px;
+  --sidebar-open: 288px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.18s;
+  --dur-base: 0.3s;
+
+  /* z-scale (documented, no ad-hoc values) */
+  --z-sticky: 100;
+  --z-drawer: 200;
+  --z-overlay: 300;
+  --z-toast: 400;
+
+  color-scheme: light;
+  accent-color: var(--color-accent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: 0.1px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+
+/* tabular figures for codes / counts */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* visually hidden, screen-reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* consistent focus ring across interactive elements */
+:where(button, a, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* subtle, warm custom scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  border: 3px solid var(--color-canvas);
+}
+
+/*
+  PRINT / PDF — export = browser "Save as PDF".
+  Hide app chrome, drop shadows, set A4 geometry, avoid ugly page breaks.
+*/
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .report-section,
+  .report-card,
+  .report-tile,
+  table,
+  tr,
+  li {
+    break-inside: avoid;
+  }
+  thead {
+    display: table-header-group;
+  }
+  @page {
+    size: A4;
+    margin: 1.5cm 1.4cm;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
