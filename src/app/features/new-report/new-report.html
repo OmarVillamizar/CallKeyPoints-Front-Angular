@@ -1,15 +1,89 @@
-<section class="page">
-  <header>
-    <p class="page__eyebrow">Nuevo reporte</p>
-    <h1 class="page__title">Generar un reporte desde una transcripción</h1>
-    <p class="page__lead">
-      Pega la transcripción de una llamada y el asistente extraerá el reporte ejecutivo
-      estructurado: cliente, clasificación, diagnóstico, acciones y resumen.
-    </p>
-  </header>
+<div class="composer-page">
+  <!-- Compositor -->
+  <form class="composer" [formGroup]="form" (ngSubmit)="submit()">
+    <header>
+      <p class="page__eyebrow">Nuevo reporte</p>
+      <h1 class="composer__title">Generar reporte desde una transcripción</h1>
+      <p class="composer__lead">
+        Pega la transcripción de la llamada. La IA usa tu base de conocimiento como fuente de
+        verdad y devuelve el reporte estructurado.
+      </p>
+    </header>
 
-  <div class="placeholder">
-    <ng-icon name="phosphorNotePencil" />
-    <p>El compositor de transcripción llega en la Fase 3.</p>
+    <div class="field">
+      <label for="transcript">Transcripción</label>
+      <textarea
+        id="transcript"
+        formControlName="transcript"
+        rows="14"
+        [maxlength]="MAX"
+        placeholder="Cliente: Buenos días, tengo un problema con…"
+      ></textarea>
+    </div>
+
+    <div class="composer__actions">
+      <span class="composer__count tnum">{{ count() }} caracteres</span>
+      <button type="submit" class="btn" [disabled]="loading() || count() === 0">
+        @if (loading()) {
+          <ng-icon class="btn__icon is-pulsing" name="phosphorSparkle" />
+          Procesando con DeepSeek…
+        } @else {
+          <ng-icon class="btn__icon" name="phosphorPaperPlaneTilt" />
+          Generar reporte
+        }
+      </button>
+    </div>
+  </form>
+
+  <!-- Resultado en vivo -->
+  <div class="result">
+    @switch (status()) {
+      @case ('idle') {
+        <div class="state state--empty">
+          <span class="state__mark"><ng-icon name="phosphorSparkle" /></span>
+          <p>El reporte estructurado aparecerá aquí en cuanto generes la transcripción.</p>
+        </div>
+      }
+      @case ('loading') {
+        <div class="sk-report" aria-live="polite" aria-busy="true">
+          <div class="sk-report__head">
+            <span class="sk sk--seal"></span>
+            <span class="sk-report__head-lines">
+              <span class="sk sk--sm"></span>
+              <span class="sk sk--md"></span>
+            </span>
+          </div>
+          <div class="sk-report__body">
+            @for (i of [0, 1, 2]; track i) {
+              <div class="sk-report__block">
+                <span class="sk sk--sm"></span>
+                <div class="sk-report__row">
+                  <span class="sk sk--tile"></span>
+                  <span class="sk sk--tile"></span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @case ('error') {
+        <div class="state state--error" role="alert">
+          <ng-icon name="phosphorWarning" />
+          <p>{{ errorMsg() }}</p>
+          <button type="button" class="btn btn--ghost" (click)="submit()">Reintentar</button>
+        </div>
+      }
+      @case ('success') {
+        @if (result(); as data) {
+          <div class="result__success">
+            <app-report [data]="data" />
+            <button type="button" class="btn btn--ghost result__open" (click)="open()">
+              Abrir y exportar
+              <ng-icon class="btn__icon" name="phosphorArrowRight" />
+            </button>
+          </div>
+        }
+      }
+    }
   </div>
-</section>
+</div>

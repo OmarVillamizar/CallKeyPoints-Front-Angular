@@ -1,0 +1,190 @@
+@let d = data();
+
+<article class="report print-area" animate.enter="report-in">
+  <!-- 1 — Cabecera -->
+  <header class="report__header">
+    <img class="report__seal" src="insignia.svg" alt="" width="64" height="64" />
+    <div class="report__heading">
+      <p class="report__eyebrow">Reporte de atención</p>
+      <h2 class="report__title">{{ d.title }}</h2>
+      <p class="report__meta">
+        <span class="tnum">#{{ d.id }}</span>
+        @if (fecha()) {
+          <span aria-hidden="true">·</span><span>{{ fecha() }}</span>
+        }
+        @if (atendio()) {
+          <span aria-hidden="true">·</span><span>Atendió: {{ atendio() }}</span>
+        }
+      </p>
+    </div>
+  </header>
+
+  <div class="report__body">
+    <!-- 2 — Datos del cliente -->
+    @if (d.numeroCuenta || d.direccion) {
+      <section class="report-section" animate.enter="section-in">
+        <h3 class="report-section__title"><span class="tick"></span>Datos del cliente</h3>
+        <div class="grid grid--2">
+          @if (d.numeroCuenta) {
+            <div class="field">
+              <span class="field__label">N.° de cuenta / factura</span>
+              <span class="field__value">{{ d.numeroCuenta }}</span>
+            </div>
+          }
+          @if (d.direccion) {
+            <div class="field">
+              <span class="field__label">Dirección</span>
+              <span class="field__value">{{ d.direccion }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 3 — Clasificación -->
+    @if (d.severidad || d.responsabilidad || d.protocoloKb) {
+      <section class="report-section" animate.enter="section-in">
+        <h3 class="report-section__title"><span class="tick"></span>Clasificación</h3>
+        <div class="stack">
+          @if (d.severidad || d.responsabilidad) {
+            <div class="chips">
+              @if (d.severidad) {
+                <span class="chip">
+                  <span class="chip__label">Severidad</span>
+                  <app-badge [tone]="severidadTone(d.severidad)">{{ d.severidad }}</app-badge>
+                </span>
+              }
+              @if (d.responsabilidad) {
+                <span class="chip">
+                  <span class="chip__label">Responsabilidad</span>
+                  <app-badge [tone]="responsabilidadTone(d.responsabilidad)">{{ d.responsabilidad }}</app-badge>
+                </span>
+              }
+            </div>
+          }
+          @if (d.protocoloKb) {
+            <div class="field">
+              <span class="field__label">Protocolo (Knowledge Base)</span>
+              <span class="field__value">{{ d.protocoloKb }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 4 — Resolución -->
+    @if (d.estadoResolucion || d.ordenTrabajo || d.tiempoRespuesta) {
+      <section class="report-section" animate.enter="section-in">
+        <h3 class="report-section__title"><span class="tick"></span>Resolución</h3>
+        <div class="grid grid--3">
+          @if (d.estadoResolucion) {
+            <div class="report-tile tile">
+              <span class="tile__label">Estado</span>
+              <app-badge [tone]="estadoTone(d.estadoResolucion)">{{ d.estadoResolucion }}</app-badge>
+            </div>
+          }
+          @if (d.ordenTrabajo) {
+            <div class="report-tile tile">
+              <span class="tile__label">Orden de trabajo</span>
+              <span class="tile__value mono">{{ d.ordenTrabajo }}</span>
+            </div>
+          }
+          @if (d.tiempoRespuesta) {
+            <div class="report-tile tile">
+              <span class="tile__label">Tiempo de respuesta</span>
+              <span class="tile__value">{{ d.tiempoRespuesta }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 5 — Diagnóstico -->
+    @if (d.sintomaReportado || d.diagnostico) {
+      <section class="report-section" animate.enter="section-in">
+        <h3 class="report-section__title"><span class="tick"></span>Diagnóstico</h3>
+        <div class="stack">
+          @if (d.sintomaReportado) {
+            <div class="field">
+              <span class="field__label">Síntoma reportado</span>
+              <span class="field__value">{{ d.sintomaReportado }}</span>
+            </div>
+          }
+          @if (d.diagnostico) {
+            <div class="field">
+              <span class="field__label">Diagnóstico técnico</span>
+              <span class="field__value">{{ d.diagnostico }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 6 — Acciones recomendadas -->
+    @if (acciones().length > 0) {
+      <section class="report-section" animate.enter="section-in">
+        <h3 class="report-section__title"><span class="tick"></span>Acciones recomendadas</h3>
+        <ul class="actions">
+          @for (a of acciones(); track $index) {
+            <li class="report-card action">
+              <ng-icon class="action__icon" name="phosphorCheckCircle" />
+              <span>{{ a }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <!-- 7 — Calidad de la atención -->
+    @if (d.cumplimientoProtocolo || d.sentimientoCliente) {
+      <section class="report-section" animate.enter="section-in">
+        <h3 class="report-section__title"><span class="tick"></span>Calidad de la atención</h3>
+        <div class="grid grid--2">
+          @if (d.cumplimientoProtocolo) {
+            <div class="report-card qcard">
+              <div class="qcard__head">
+                <span class="qcard__label">Cumplimiento de protocolo</span>
+                <app-badge [tone]="cumplimiento()">{{ cumplimientoLabel() }}</app-badge>
+              </div>
+              <p class="qcard__text">{{ d.cumplimientoProtocolo }}</p>
+            </div>
+          }
+          @if (d.sentimientoCliente) {
+            <div class="report-card qcard">
+              <span class="qcard__label">Sentimiento del cliente</span>
+              <div class="qcard__badge">
+                <app-badge [tone]="sentimientoTone(d.sentimientoCliente)">{{ d.sentimientoCliente }}</app-badge>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 8 — Resumen ejecutivo -->
+    @if (d.reportSummary) {
+      <section class="report-section" animate.enter="section-in">
+        <h3 class="report-section__title"><span class="tick"></span>Resumen ejecutivo</h3>
+        <div class="report-card summary">
+          <p>{{ d.reportSummary }}</p>
+        </div>
+      </section>
+    }
+  </div>
+
+  <!-- 9 — Pie -->
+  <footer class="report__footer">
+    <span class="report__footer-brand">
+      <img src="logo.svg" alt="CallKeyPoints" height="16" />
+      <span>Documento confidencial</span>
+    </span>
+    <span class="report__footer-meta">
+      @if (fecha()) {
+        <span>Generado el {{ fecha() }}</span>
+      }
+      @if (otNumber()) {
+        <span class="mono">OT {{ otNumber() }}</span>
+      }
+    </span>
+  </footer>
+</article>
