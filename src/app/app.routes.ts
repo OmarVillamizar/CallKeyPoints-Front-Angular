@@ -8,11 +8,24 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login').then((m) => m.Login),
   },
   {
-    // Phase 1: temporary authenticated landing. Phase 2 replaces this with the app shell
-    // (sidebar + child routes: /new, /calls/:id, /config).
     path: '',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/home/home').then((m) => m.Home),
+    loadComponent: () => import('./layout/app-shell/app-shell').then((m) => m.AppShell),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'new' },
+      {
+        path: 'new',
+        loadComponent: () => import('./features/new-report/new-report').then((m) => m.NewReport),
+      },
+      {
+        path: 'calls/:id',
+        loadComponent: () => import('./features/call-report/call-report').then((m) => m.CallReport),
+      },
+      {
+        path: 'config',
+        loadComponent: () => import('./features/config/config').then((m) => m.Config),
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

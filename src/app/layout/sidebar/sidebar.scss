@@ -1,0 +1,396 @@
+/*
+  Icon-rail sidebar. Host reserves the layout width (rail 64 / open 288 when pinned). The
+  inner .panel is absolutely positioned and Motion-One springs its own width, so a hover
+  expand floats over content (no reflow) while a pin commits the layout.
+*/
+
+:host {
+  display: block;
+  position: relative;
+  flex: 0 0 auto;
+  height: 100%;
+  z-index: var(--z-sticky);
+  transition: width var(--dur-base) var(--ease-out);
+}
+
+.panel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-rail);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-line);
+  overflow: hidden;
+  will-change: width;
+}
+
+:host.is-floating .panel {
+  box-shadow: var(--shadow-lg);
+  border-right-color: var(--color-line-strong);
+}
+
+:host.is-drawer {
+  height: 100%;
+  z-index: auto;
+}
+:host.is-drawer .panel {
+  box-shadow: none;
+}
+
+/* Labels + fields reveal only when expanded. */
+.label {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+}
+:host.is-expanded .label {
+  opacity: 1;
+}
+:host:not(.is-expanded) .label {
+  pointer-events: none;
+}
+
+/* ---- shared link / row affordance ---- */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+button {
+  font: inherit;
+}
+
+.cta,
+.nav-link,
+.item,
+.search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--radius-input);
+}
+:host:not(.is-expanded) :is(.cta, .nav-link, .item, .search) {
+  justify-content: center;
+  padding: 0;
+}
+
+ng-icon {
+  flex: 0 0 auto;
+  font-size: 17px;
+  line-height: 0;
+}
+
+.block {
+  padding: 0 12px;
+}
+.block:first-of-type {
+  padding-top: 4px;
+}
+
+/* ---- header ---- */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 60px;
+  padding: 0 14px;
+  flex: 0 0 auto;
+}
+:host:not(.is-expanded) .head {
+  justify-content: center;
+  padding: 0;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+}
+.brand__mark {
+  display: block;
+}
+.brand__word {
+  display: none;
+}
+:host.is-expanded .brand__mark {
+  display: none;
+}
+:host.is-expanded .brand__word {
+  display: block;
+}
+
+:host:not(.is-expanded) .head__pin {
+  display: none;
+}
+
+/* ---- new report CTA ---- */
+.cta {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cta:hover {
+  background: var(--color-accent-strong);
+}
+.cta__icon {
+  color: var(--color-on-accent);
+}
+
+/* ---- search ---- */
+.search {
+  background: var(--color-soft);
+  border: 1px solid var(--color-line);
+}
+.search:focus-within {
+  border-color: var(--color-accent);
+  background: var(--color-surface);
+}
+.search__icon {
+  color: var(--color-ink-faint);
+  font-size: 15px;
+}
+.search__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font-size: 13px;
+}
+.search__input::placeholder {
+  color: var(--color-ink-faint);
+}
+.search__input:focus {
+  outline: none;
+}
+
+/* ---- sessions list ---- */
+.list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 12px 8px;
+}
+/* collapsed: keep the flex spacer but hide the contents */
+:host:not(.is-expanded) .list > * {
+  display: none;
+}
+
+.list__title {
+  padding: 8px 8px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-faint);
+}
+
+.list__msg {
+  padding: 28px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-ink-faint);
+}
+
+.item {
+  position: relative;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.item:hover {
+  background: var(--color-soft);
+}
+.item.is-active {
+  background: var(--color-accent-soft);
+}
+.item__icon {
+  color: var(--color-ink-faint);
+  font-size: 16px;
+}
+.item.is-active .item__icon {
+  color: var(--color-accent);
+}
+.item__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  gap: 1px;
+}
+.item__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.item.is-active .item__title {
+  color: var(--color-accent-strong);
+}
+.item__time {
+  font-size: 11px;
+  color: var(--color-ink-faint);
+}
+.item__del {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-faint);
+  border-radius: 7px;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+.item__del ng-icon {
+  font-size: 14px;
+}
+.item:hover .item__del {
+  opacity: 1;
+}
+.item__del:hover {
+  background: var(--color-alert-soft);
+  color: var(--color-alert);
+}
+
+@keyframes item-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.item-in {
+  animation: item-in var(--dur-base) var(--ease-out) both;
+}
+
+.skeleton {
+  height: 40px;
+  margin-bottom: 6px;
+  border-radius: var(--radius-input);
+  background: linear-gradient(
+    90deg,
+    var(--color-soft) 0%,
+    var(--color-soft-strong) 50%,
+    var(--color-soft) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.3s linear infinite;
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---- footer ---- */
+.foot {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--color-line);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-link {
+  color: var(--color-ink-soft);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.nav-link:hover {
+  background: var(--color-soft);
+  color: var(--color-ink);
+}
+.nav-link.is-active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+}
+.nav-link__icon {
+  color: inherit;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 12px;
+  margin-top: 2px;
+}
+:host:not(.is-expanded) .user {
+  justify-content: center;
+  padding: 0;
+}
+.user__avatar {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.user__email {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--color-ink-soft);
+}
+
+/* ---- generic icon button (pin / close / signout) ---- */
+.icon-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-faint);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+.icon-btn ng-icon {
+  font-size: 16px;
+}
+.icon-btn:hover {
+  background: var(--color-soft);
+  color: var(--color-ink);
+}
+.head__pin.is-on {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}

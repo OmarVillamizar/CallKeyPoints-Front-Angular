@@ -1,0 +1,111 @@
+<div class="panel" #panel>
+  <header class="head">
+    <a class="brand" routerLink="/new" (click)="onLink()" aria-label="CallKeyPoints — inicio">
+      <img class="brand__mark" src="insignia.svg" alt="" width="34" height="34" />
+      <img class="brand__word" src="logo.svg" alt="CallKeyPoints" height="26" />
+    </a>
+
+    @if (isDrawer()) {
+      <button type="button" class="icon-btn head__close" (click)="dismiss.emit()" aria-label="Cerrar menú">
+        <ng-icon name="phosphorX" />
+      </button>
+    } @else {
+      <button
+        type="button"
+        class="icon-btn head__pin"
+        [class.is-on]="pinned()"
+        (click)="togglePin()"
+        [attr.aria-pressed]="pinned()"
+        [attr.aria-label]="pinned() ? 'Desfijar barra' : 'Fijar barra'"
+        [title]="pinned() ? 'Desfijar barra' : 'Fijar barra'"
+      >
+        <ng-icon [name]="pinned() ? 'phosphorPushPinSlash' : 'phosphorPushPin'" />
+      </button>
+    }
+  </header>
+
+  <div class="block">
+    <a class="cta" routerLink="/new" routerLinkActive="is-active" (click)="onLink()">
+      <ng-icon class="cta__icon" name="phosphorPlus" />
+      <span class="label">Nuevo reporte</span>
+    </a>
+  </div>
+
+  <div class="block">
+    <div class="search">
+      <ng-icon class="search__icon" name="phosphorMagnifyingGlass" />
+      <input
+        #searchEl
+        class="search__input label"
+        type="search"
+        [value]="query()"
+        (input)="query.set(searchEl.value)"
+        placeholder="Buscar caso…"
+        aria-label="Buscar caso"
+      />
+    </div>
+  </div>
+
+  <nav class="list" aria-label="Casos">
+    <p class="list__title label">Casos</p>
+
+    @if (store.loading()) {
+      <div class="list__skeletons">
+        @for (i of [0, 1, 2, 3]; track i) {
+          <div class="skeleton"></div>
+        }
+      </div>
+    } @else if (store.error(); as err) {
+      <p class="list__msg label">{{ err }}</p>
+    } @else if (filtered().length === 0) {
+      <p class="list__msg label">
+        {{ query() ? 'Sin coincidencias.' : 'Aún no hay casos. Crea el primero.' }}
+      </p>
+    } @else {
+      @for (c of filtered(); track c.id) {
+        <a
+          class="item"
+          [routerLink]="['/calls', c.id]"
+          routerLinkActive="is-active"
+          (click)="onLink()"
+          animate.enter="item-in"
+        >
+          <ng-icon class="item__icon" name="phosphorFileText" />
+          <span class="item__body label">
+            <span class="item__title">{{ c.title }}</span>
+            <span class="item__time tnum">{{ relative(c.createdAt) }}</span>
+          </span>
+          <button
+            type="button"
+            class="item__del"
+            (click)="remove($event, c.id)"
+            aria-label="Eliminar caso"
+          >
+            <ng-icon name="phosphorTrash" />
+          </button>
+        </a>
+      }
+    }
+  </nav>
+
+  <footer class="foot">
+    <a class="nav-link" routerLink="/config" routerLinkActive="is-active" (click)="onLink()">
+      <ng-icon class="nav-link__icon" name="phosphorGearSix" />
+      <span class="label">Configuración</span>
+    </a>
+
+    <div class="user">
+      <span class="user__avatar" aria-hidden="true">{{ initial() }}</span>
+      <span class="user__email label">{{ email() }}</span>
+      <button
+        type="button"
+        class="icon-btn user__out"
+        (click)="signOut()"
+        aria-label="Cerrar sesión"
+        title="Cerrar sesión"
+      >
+        <ng-icon name="phosphorSignOut" />
+      </button>
+    </div>
+  </footer>
+</div>

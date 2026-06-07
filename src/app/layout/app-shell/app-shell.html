@@ -1,0 +1,25 @@
+<div class="shell">
+  <app-sidebar class="shell__rail no-print" mode="rail" />
+
+  @if (drawerOpen()) {
+    <div class="drawer no-print">
+      <div class="drawer__scrim" (click)="close()" animate.enter="scrim-in" animate.leave="scrim-out"></div>
+      <div class="drawer__panel" animate.enter="drawer-in" animate.leave="drawer-out">
+        <app-sidebar mode="drawer" (navigate)="close()" (dismiss)="close()" />
+      </div>
+    </div>
+  }
+
+  <div class="shell__main">
+    <header class="topbar no-print">
+      <button type="button" class="icon-btn" (click)="open()" aria-label="Abrir menú">
+        <ng-icon name="phosphorList" />
+      </button>
+      <img src="logo.svg" alt="CallKeyPoints" height="24" />
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
