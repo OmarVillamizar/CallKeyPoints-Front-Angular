@@ -6,6 +6,6 @@
 export const environment = {
   production: false,
   apiBaseUrl: 'http://localhost:9080',
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  supabaseUrl: 'https://uxyswambwshpgmqjhgtj.supabase.co',
+  supabaseAnonKey: 'sb_publishable_bgRnOTJlTIleOiJT0CJmcQ_Io_DTpMz',
 };
